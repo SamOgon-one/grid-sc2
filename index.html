@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>grid-sc2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="light-mode" style="margin: 0; display: flex; height: 100vh; flex-direction: row; overflow: hidden;">
+    <div id="cellInfo">X: 0, Y: 0</div>
+
+    <!-- Sidebar Pane (Left side) -->
+    <div
+        style="width: 300px; min-width: 300px; background-color: var(--control-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 15px; gap: 15px; overflow-y: auto; z-index: 5;">
+        <!-- Top row: Help -->
+        <div
+            style="display: flex; justify-content: flex-start; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
+            <button id="openHelp"
+                style="font-size: 11px; padding: 4px 8px; border: 1px solid #888; border-radius: 4px; cursor: pointer;">Help
+                (?)</button>
+        </div>
+
+        <!-- Controls List -->
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label style="font-weight: bold; font-size: 12px;">Map:</label>
+            <select id="mapSelect">
+                <!-- Dynamically populated by grid-sc.js -->
+            </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label style="font-weight: bold; font-size: 12px;">Map upload:</label>
+            <input type="file" id="jsonInput" accept=".json">
+        </div>
+
+        <div id="statusMessage" style="font-size: 12px;">Initialization...</div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 5px; font-size: 13px;">
+                <span style="font-weight: bold;">Zoom:</span>
+                <input type="range" id="zoomLevel" min="6" max="18" value="8" style="flex: 1;">
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <button id="fitWidthBtn" style="flex: 1;">Fit Width</button>
+                <button id="fitHeightBtn" style="flex: 1;">Fit Height</button>
+            </div>
+            <label style="font-size: 13px; margin-top: 5px;"><input type="checkbox" id="showGrid" checked> Show
+                Grid</label>
+        </div>
+
+        <!-- <hr style="border: none; border-top: 1px solid var(--border-color); width: 100%; margin: 5px 0;"> -->
+
+        <!-- Telemetry & Size -->
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label style="font-weight: bold; font-size: 12px;">Size:</label>
+            <select id="structSize" size="4" style="height: auto;">
+                <option value="1x1" style="padding: 6px;">1x1</option>
+                <option value="2x2" style="padding: 6px;">2x2</option>
+                <option value="3x3" selected style="padding: 6px;">3x3</option>
+                <option value="5x5" style="padding: 6px;">5x5</option>
+            </select>
+        </div>
+
+        <!-- Dashboard Console -->
+        <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+            <div style="display: flex; gap: 4px;">
+                <button id="mirrorVertBtn" style="flex: 1; font-size: 11px; padding: 5px; background: #555;">Flip
+                    Vertical</button>
+                <button id="mirrorHorizBtn" style="flex: 1; font-size: 11px; padding: 5px; background: #555;">Flip
+                    Horizontal</button>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button id="undoBtn" style="flex: 1; font-size: 12px; padding: 6px;">Undo (ctrl / cmd + z)</button>
+            </div>
+            <textarea id="dataDisplay" readonly placeholder="Output (Click to copy):"
+                title="Click to copy all text to clipboard" style="flex: 1; min-height: 150px;"></textarea>
+
+            <div style="display: flex; gap: 4px; align-items: stretch;">
+                <input type="text" id="yourLabel" placeholder=".json file name"
+                    style="flex: 2; font-size: 12px; padding: 5px; min-width: 0;">
+                <button id="saveJsonBtn" style="flex: 1; font-size: 12px; padding: 6px; background: #0078d4;">Save
+                    JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Map Canvas Area (Right side) -->
+    <div id="canvasContainer"
+        style="flex: 1; overflow: auto; display: flex; align-items: flex-start; justify-content: flex-start; padding: 20px; position: relative;">
+        <canvas id="mapCanvas"></canvas>
+    </div>
+
+    <!-- Help & Settings Modal -->
+    <div class="modal-overlay" id="helpOverlay"></div>
+    <div class="modal" id="helpModal">
+        <div class="modal-header">Quick Help</div>
+
+        <div class="modal-content">
+            <!-- Theme Selection -->
+            <div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid var(--border-color);">Theme
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 15px;">
+                <span>Select Theme:</span>
+                <select id="themeSelect" style="padding: 2px 5px; font-size: 11px;">
+                    <option value="light" selected>Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </div>
+
+            <!-- Legend -->
+            <div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid var(--border-color);">Legend
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; margin-bottom: 15px;">
+                <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
+                    <div class="legend-color"
+                        style="width: 12px; height: 12px; border-radius: 2px; background: rgba(0, 127, 0, 0.75);"></div>
+                    <span>Placeable</span>
+                </div>
+                <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
+                    <div class="legend-color"
+                        style="width: 12px; height: 12px; border-radius: 2px; background: rgba(0, 76, 127, 0.75);">
+                    </div>
+                    <span>Pathable Only</span>
+                </div>
+                <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
+                    <div class="legend-color"
+                        style="width: 12px; height: 12px; border-radius: 2px; background: rgba(255, 255, 0, 0.7);">
+                    </div>
+                    <span>Your Buildings</span>
+                </div>
+            </div>
+
+            <div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid var(--border-color);">Shortcuts
+            </div>
+            <div class="shortcut-list">
+                <div class="shortcut-item"><span>Log Point</span> <span class="kbd">Left Click</span></div>
+                <div class="shortcut-item"><span>Undo Last Point</span> <span class="kbd">Ctrl/Cmd + Z</span></div>
+                <div class="shortcut-item"><span>Copy Logs</span> <span class="kbd">Click Display Box</span></div>
+                <div class="shortcut-item"><span>Toggle Help</span> <span class="kbd">?</span></div>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="justify-content: flex-end;">
+            <button id="closeHelp">Close</button>
+        </div>
+    </div>
+
+    <script src="grid-sc.js"></script>
+</body>
+
+</html>
