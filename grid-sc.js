@@ -45,47 +45,9 @@ let loggedPoints = {
 };
 let clickHistory = [];
 
-async function populateMapDropdown() {
-    try {
-        const response = await fetch('maps/');
-        if (!response.ok) throw new Error("Could not fetch maps directory.");
-        const text = await response.text();
-        
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        const links = Array.from(doc.querySelectorAll('a'));
-        
-        const jsonFiles = links
-            .map(a => a.getAttribute('href'))
-            .filter(href => href && href.endsWith('.json'));
-            
-        if (jsonFiles.length > 0) {
-            mapSelect.innerHTML = ''; 
-            jsonFiles.forEach(file => {
-                const option = document.createElement('option');
-                option.value = `maps/${file}`;
-                // Decode URI component to handle spaces or special characters in filenames from links
-                option.textContent = decodeURIComponent(file);
-                mapSelect.appendChild(option);
-            });
-            return true;
-        }
-    } catch (e) {
-        console.warn("Could not dynamically load map list.", e);
-    }
-    return false;
-}
-
 // Initial Load
-window.onload = async function () {
-    updateStatus("Scanning maps/ folder...");
-    const loadedDynamic = await populateMapDropdown();
-    if (loadedDynamic && mapSelect.options.length > 0) {
-        loadMapFromUrl(mapSelect.options[0].value);
-    } else {
-        mapSelect.innerHTML = '<option value="">No maps found in maps/ folder</option>';
-        updateStatus("No maps found. Export a json and place it in the maps/ folder.", "#ff6666");
-    }
+window.onload = function () {
+    loadMapFromUrl(mapSelect.value);
 };
 
 yourLabelInput.addEventListener('input', () => {
