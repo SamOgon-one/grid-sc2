@@ -10,7 +10,7 @@ let statusTimeout = null;
 
 // UI Elements
 const mapSelect = document.getElementById('mapSelect');
-// const jsonInput = document.getElementById('jsonInput');
+const jsonInput = document.getElementById('jsonInput');
 const statusMessage = document.getElementById('statusMessage');
 const cellInfo = document.getElementById('cellInfo');
 const zoomInput = document.getElementById('zoomLevel');
@@ -102,25 +102,23 @@ async function loadMapFromUrl(url) {
     }
 }
 
-// if (jsonInput) {
-//     jsonInput.addEventListener('change', function (event) {
-//         const file = event.target.files[0];
-//         if (!file) return;
-//         activeMapName = file.name.replace('.json', '');
-//         const reader = new FileReader();
-//         reader.onload = function (e) {
-//             try {
-//                 currentMapData = JSON.parse(e.target.result);
-//                 renderMap(currentMapData);
-//                 updateStatus(`Active: ${file.name}`, "#4db8ff");
-//                 mapSelect.value = "";
-//             } catch (err) {
-//                 updateStatus("Error: Invalid JSON format", "#ff6666");
-//             }
-//         };
-//         reader.readAsText(file);
-//     });
-// }
+jsonInput.addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    activeMapName = file.name.replace('.json', '');
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            currentMapData = JSON.parse(e.target.result);
+            renderMap(currentMapData);
+            updateStatus(`Active: ${file.name}`, "#4db8ff");
+            mapSelect.value = "";
+        } catch (err) {
+            updateStatus("Error: Invalid JSON format", "#ff6666");
+        }
+    };
+    reader.readAsText(file);
+});
 
 // Fit Logic
 fitWidthBtn.addEventListener('click', () => {
