@@ -10,7 +10,7 @@ let statusTimeout = null;
 
 // UI Elements
 const mapSelect = document.getElementById('mapSelect');
-const jsonInput = document.getElementById('jsonInput');
+// const jsonInput = document.getElementById('jsonInput');
 const statusMessage = document.getElementById('statusMessage');
 const cellInfo = document.getElementById('cellInfo');
 const zoomInput = document.getElementById('zoomLevel');
@@ -34,7 +34,7 @@ const closeHelp = document.getElementById('closeHelp');
 const helpModal = document.getElementById('helpModal');
 const helpOverlay = document.getElementById('helpOverlay');
 
-const defaultAlpha = 0.75; 
+const defaultAlpha = 0.75;
 
 // Data Logging & Undo History
 let loggedPoints = {
@@ -102,23 +102,25 @@ async function loadMapFromUrl(url) {
     }
 }
 
-jsonInput.addEventListener('change', function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    activeMapName = file.name.replace('.json', '');
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-            currentMapData = JSON.parse(e.target.result);
-            renderMap(currentMapData);
-            updateStatus(`Active: ${file.name}`, "#4db8ff");
-            mapSelect.value = ""; 
-        } catch (err) {
-            updateStatus("Error: Invalid JSON format", "#ff6666");
-        }
-    };
-    reader.readAsText(file);
-});
+// if (jsonInput) {
+//     jsonInput.addEventListener('change', function (event) {
+//         const file = event.target.files[0];
+//         if (!file) return;
+//         activeMapName = file.name.replace('.json', '');
+//         const reader = new FileReader();
+//         reader.onload = function (e) {
+//             try {
+//                 currentMapData = JSON.parse(e.target.result);
+//                 renderMap(currentMapData);
+//                 updateStatus(`Active: ${file.name}`, "#4db8ff");
+//                 mapSelect.value = "";
+//             } catch (err) {
+//                 updateStatus("Error: Invalid JSON format", "#ff6666");
+//             }
+//         };
+//         reader.readAsText(file);
+//     });
+// }
 
 // Fit Logic
 fitWidthBtn.addEventListener('click', () => {
@@ -178,7 +180,7 @@ function renderMap(mapData) {
 
     let minZ = 255, maxZ = 0;
     let minP = 255, maxP = 0, minT = 255, maxT = 0;
-    
+
     if (zHeights) {
         for (let i = 0; i < zHeights.length; i++) {
             minZ = Math.min(minZ, zHeights[i]);
@@ -194,7 +196,7 @@ function renderMap(mapData) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < pHeights.length; i++) {
         const p = pHeights[i]; const t = tHeights[i];
-        const x = (i % mapGridWidth); const y = Math.floor(i / mapGridWidth); 
+        const x = (i % mapGridWidth); const y = Math.floor(i / mapGridWidth);
         const drawY = (mapGridHeight - 1 - y);
         const canvasX = x * cellSize; const canvasY = drawY * cellSize;
 
@@ -246,9 +248,9 @@ function getGridPos(e) {
 
 function getOffsets(size) {
     let offsets = [];
-    if (size === '3x3') { for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) offsets.push({ dx, dy }); } 
-    else if (size === '5x5') { for (let dx = -2; dx <= 2; dx++) for (let dy = -2; dy <= 2; dy++) offsets.push({ dx, dy }); } 
-    else if (size === '2x2') { offsets = [{ dx: 0, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: -1 }, { dx: -1, dy: -1 }]; } 
+    if (size === '3x3') { for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) offsets.push({ dx, dy }); }
+    else if (size === '5x5') { for (let dx = -2; dx <= 2; dx++) for (let dy = -2; dy <= 2; dy++) offsets.push({ dx, dy }); }
+    else if (size === '2x2') { offsets = [{ dx: 0, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: -1 }, { dx: -1, dy: -1 }]; }
     else { offsets = [{ dx: 0, dy: 0 }]; }
     return offsets;
 }
@@ -271,7 +273,7 @@ function drawLoggedBuildings() {
                     minLX = Math.min(minLX, tx); maxLX = Math.max(maxLX, tx);
                     minLY = Math.min(minLY, ty); maxLY = Math.max(maxLY, ty);
                     const drawScreenY = (mapGridHeight - 1 - ty);
-                    ctx.fillStyle = "rgba(255, 255, 0, 0.7)"; 
+                    ctx.fillStyle = "rgba(255, 255, 0, 0.7)";
                     ctx.fillRect(tx * cellSize, drawScreenY * cellSize, cellSize, cellSize);
                 }
             });
@@ -279,7 +281,7 @@ function drawLoggedBuildings() {
             if (minLX !== Infinity) {
                 const drawMinSY = mapGridHeight - 1 - maxLY;
                 ctx.strokeStyle = "#000"; ctx.lineWidth = 1.5;
-                ctx.strokeRect(minLX * cellSize, drawMinSY * cellSize, (maxLX-minLX+1)*cellSize, (maxLY-minLY+1)*cellSize);
+                ctx.strokeRect(minLX * cellSize, drawMinSY * cellSize, (maxLX - minLX + 1) * cellSize, (maxLY - minLY + 1) * cellSize);
             }
         });
     }
@@ -332,7 +334,7 @@ canvas.addEventListener('mousemove', function (e) {
         const drawMinSY = mapGridHeight - 1 - maxLY;
         ctx.strokeStyle = isDark ? "#fff" : "#000";
         ctx.lineWidth = 1;
-        ctx.strokeRect(minLX * cellSize, drawMinSY * cellSize, (maxLX-minLX+1)*cellSize, (maxLY-minLY+1)*cellSize);
+        ctx.strokeRect(minLX * cellSize, drawMinSY * cellSize, (maxLX - minLX + 1) * cellSize, (maxLY - minLY + 1) * cellSize);
     }
 
     ctx.strokeStyle = "red"; ctx.lineWidth = 1;
@@ -354,7 +356,7 @@ canvas.addEventListener('click', (e) => {
     const strucSize = structSelect.value;
     loggedPoints[strucSize].push({ x: pos.globalX, y: pos.globalY });
     clickHistory.push(strucSize);
-    renderMap(currentMapData); 
+    renderMap(currentMapData);
     refreshDisplay();
     updateStatus(`Logged ${strucSize} at ${pos.globalX},${pos.globalY}`, "#107c10");
 });
