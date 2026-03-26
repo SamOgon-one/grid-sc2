@@ -35,7 +35,7 @@
             </select>
         </div>
 
-        <div style="display: none; flex-direction: column; gap: 4px;">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
             <label style="font-weight: bold; font-size: 12px;">Map upload:</label>
             <input type="file" id="jsonInput" accept=".json">
         </div>
@@ -71,10 +71,9 @@
         <!-- Dashboard Console -->
         <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
             <div style="display: flex; gap: 4px;">
-                <button id="mirrorVertBtn" style="flex: 1; font-size: 11px; padding: 5px; background: #555;">Flip
-                    Vertical</button>
-                <button id="mirrorHorizBtn" style="flex: 1; font-size: 11px; padding: 5px; background: #555;">Flip
-                    Horizontal</button>
+                <button id="mirrorVertBtn" style="flex: 1; font-size: 11px; padding: 5px; background: #555;">Flip Vertical</button>
+                <button id="mirrorHorizBtn" style="flex: 1; font-size: 11px; padding: 5px; background: #555;">Flip Horizontal</button>
+                <button id="mirrorDiagBtn" style="flex: 1; font-size: 11px; padding: 5px; background: #555;">Flip Diagonal</button>
             </div>
             <div style="display: flex; gap: 4px;">
                 <button id="undoBtn" style="flex: 1; font-size: 12px; padding: 6px;">Undo (ctrl / cmd + z)</button>
@@ -147,7 +146,9 @@
             </div>
         </div>
 
-        <div class="modal-footer" style="justify-content: flex-end;">
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="https://github.com/SamOgon-one/grid-sc2" target="_blank"
+                style="font-size: 11px; color: #0078d4; text-decoration: none; font-weight: bold;">GitHub Repository</a>
             <button id="closeHelp">Close</button>
         </div>
     </div>

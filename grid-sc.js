@@ -25,6 +25,7 @@ const undoBtn = document.getElementById('undoBtn');
 const mirrorVertBtn = document.getElementById('mirrorVertBtn');
 const mirrorHorizBtn = document.getElementById('mirrorHorizBtn');
 const saveJsonBtn = document.getElementById('saveJsonBtn');
+const mirrorDiagBtn = document.getElementById('mirrorDiagBtn');
 
 let activeMapName = "unknown";
 
@@ -413,26 +414,38 @@ function mirrorPoints(axis) {
         loggedPoints[size] = loggedPoints[size].map(pt => {
             if (axis === 'y') {
                 // Vertical Mirror: Flip Global Y around playable center
-                // localY = pt.y - y_margin
-                // newLocalY = (height - 1) - localY
                 const localY = pt.y - y_margin;
                 const newLocalY = (height - 1) - localY;
                 return { x: pt.x, y: newLocalY + y_margin };
-            } else {
+            } else if (axis === 'x') {
                 // Horizontal Mirror: Flip Global X around playable center
                 const localX = pt.x - x_margin;
                 const newLocalX = (width - 1) - localX;
                 return { x: newLocalX + x_margin, y: pt.y };
+            } else if (axis === 'diag') {
+                // Diagonal Mirror: Swap X and Y relative to playable center
+                // This is a reflection across the line Y=X
+                const localX = pt.x - x_margin;
+                const localY = pt.y - y_margin;
+                // If map is non-square, we map proportionally
+                const newLocalX = Math.round(localY * ((width - 1) / (height - 1)));
+                const newLocalY = Math.round(localX * ((height - 1) / (width - 1)));
+                return { x: newLocalX + x_margin, y: newLocalY + y_margin };
             }
         });
     }
     renderMap(currentMapData);
     refreshDisplay();
-    updateStatus(`Mirrored structures ${axis === 'y' ? 'vertically' : 'horizontally'}.`);
+    let msg = "";
+    if (axis === 'y') msg = "vertically";
+    else if (axis === 'x') msg = "horizontally";
+    else if (axis === 'diag') msg = "diagonally";
+    updateStatus(`Mirrored structures ${msg}.`);
 }
 
 mirrorVertBtn.addEventListener('click', () => mirrorPoints('y'));
 mirrorHorizBtn.addEventListener('click', () => mirrorPoints('x'));
+mirrorDiagBtn.addEventListener('click', () => mirrorPoints('diag'));
 
 dataDisplay.addEventListener('click', () => {
     if (!dataDisplay.value) return;

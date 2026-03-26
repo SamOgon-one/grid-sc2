@@ -32,7 +32,7 @@ class create_grid_bot(BotAI):
         if iteration == 2:
 
             # trim to playable area
-            y_margin, x_margin, width, height = self.game_info.playable_area
+            x_margin, y_margin, width, height = self.game_info.playable_area
             placement_map = self.game_info.placement_grid.data_numpy[y_margin:y_margin+height, x_margin:x_margin+width]
             pathing_map = self.game_info.pathing_grid.data_numpy[y_margin:y_margin+height, x_margin:x_margin+width]
             terrain_height = self.game_info.terrain_height.data_numpy[y_margin:y_margin+height, x_margin:x_margin+width]
