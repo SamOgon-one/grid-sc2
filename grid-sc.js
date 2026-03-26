@@ -97,6 +97,7 @@ async function loadMapFromUrl(url) {
         if (!response.ok) throw new Error("CORS or 404");
         currentMapData = await response.json();
         renderMap(currentMapData);
+        fitHeight();
         updateStatus(`Active: ${url.split('/').pop()}`);
     } catch (err) {
         updateStatus("Offline: Use 'Map upload' or a local server for dropdown maps.", "#ff6666");
@@ -112,6 +113,7 @@ jsonInput.addEventListener('change', function (event) {
         try {
             currentMapData = JSON.parse(e.target.result);
             renderMap(currentMapData);
+            fitHeight();
             updateStatus(`Active: ${file.name}`, "#4db8ff");
             mapSelect.value = "";
         } catch (err) {
@@ -130,7 +132,9 @@ fitWidthBtn.addEventListener('click', () => {
     applyNewZoom(newCellSize);
 });
 
-fitHeightBtn.addEventListener('click', () => {
+fitHeightBtn.addEventListener('click', fitHeight);
+
+function fitHeight() {
     if (!mapGridHeight || !mapGridWidth) return;
     const container = document.getElementById('canvasContainer');
     // Adjust buffer for footer
@@ -142,7 +146,7 @@ fitHeightBtn.addEventListener('click', () => {
         newCellSize = Math.floor(availableWidth / mapGridWidth);
     }
     applyNewZoom(newCellSize);
-});
+}
 
 function applyNewZoom(size) {
     if (size < 1) size = 1;
